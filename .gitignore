@@ -1,0 +1,9 @@
+# Secrets
+.env
+*.env.local
+
+# IDE
+.idea/
+
+# gradio_cli_app has its own repo
+gradio_cli_app/
