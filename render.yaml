@@ -1,0 +1,39 @@
+# Render Blueprint - RAG Agent (free tier)
+# Docs: https://render.com/docs/blueprint-spec
+#
+# rootDir is deliberately left at the repo root: render/ sits beside
+# RAG_Agent_Project/, so scoping the service into RAG_Agent_Project would put
+# render/requirements.txt out of reach of the build. render/app.py chdir's into
+# RAG_Agent_Project itself, which is where ./storage_local and ./dummy_data
+# need the process to be.
+
+services:
+  - type: web
+    name: rag-agent
+    runtime: python
+    plan: free
+    region: oregon
+
+    buildCommand: >-
+      pip install --upgrade pip &&
+      pip install -r render/requirements.txt &&
+      python render/app.py --build-index
+
+    startCommand: python render/app.py
+
+    envVars:
+      # 3.11 is the widest overlap: gradio 5.x, llama-index-core 0.14.x and
+      # cohere 5.x all ship wheels for it, and every transitive binary
+      # (numpy, pillow, tiktoken, aiohttp) has a manylinux 3.11 wheel, so
+      # nothing gets compiled from source inside the free build.
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+
+      # Set in the Render dashboard, never committed.
+      - key: COHERE_API_KEY
+        sync: false
+
+      # Skip gradio's startup version-check request; on a cold start it is
+      # latency before the port is bound.
+      - key: GRADIO_ANALYTICS_ENABLED
+        value: "False"

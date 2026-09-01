@@ -1,0 +1,31 @@
+# ===================================
+# RAG Agent - Render (Linux) deploy set
+# Derived from RAG_Agent_Project/requirements_final.txt
+# ===================================
+
+# LlamaIndex Core
+# Upper bound added: the Cohere integrations below cap core at <0.15,
+# stating it here keeps pip from backtracking through dozens of releases.
+llama-index-core>=0.12.0,<0.15
+
+# Embeddings + LLM - Cohere
+llama-index-embeddings-cohere>=0.4.0
+llama-index-llms-cohere>=0.4.0
+# Was `cohere>=5.0.0`. Both llama-index integrations require cohere<6, and an
+# unbounded pin makes the resolver walk back from 7.x on every build.
+cohere>=5.15,<6
+
+# UI - Gradio
+# Was `gradio>=5.9.0`. Capped below 6 because gradio 6 reworked ChatInterface
+# and this UI was written and tested against the 5.x API.
+gradio>=5.9.0,<6
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.67.0
+
+# Removed for this deployment:
+#   python-certifi-win32  - Windows-only, has no Linux wheel and no reason to exist here
+#   urllib3==1.26.18      - pinned only to match the SSL-bypass monkeypatch signature
+#   pinecone-client       - app_local.py persists to disk, it never touches Pinecone
+#   llama-index-vector-stores-pinecone  - same
